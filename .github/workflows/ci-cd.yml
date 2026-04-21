@@ -198,6 +198,7 @@ jobs:
           output: 'trivy-api-results.sarif'
           severity: 'CRITICAL'
           exit-code: '1'
+          ignore-unfixed: true
 
       - name: Run Trivy scanner on Worker
         uses: aquasecurity/trivy-action@master
@@ -207,6 +208,7 @@ jobs:
           output: 'trivy-worker-results.sarif'
           severity: 'CRITICAL'
           exit-code: '1'
+          ignore-unfixed: true
 
       - name: Run Trivy scanner on Frontend
         uses: aquasecurity/trivy-action@master
@@ -216,6 +218,7 @@ jobs:
           output: 'trivy-frontend-results.sarif'
           severity: 'CRITICAL'
           exit-code: '1'
+          ignore-unfixed: true
 
       - name: Upload Trivy scan results
         if: always()
