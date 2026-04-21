@@ -3,6 +3,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
+# Upgrade packages
+RUN apk upgrade --no-cache
+
 # Copy package files
 COPY package*.json ./
 
@@ -12,8 +15,9 @@ RUN npm install --omit=dev
 # Production stage
 FROM node:18-alpine AS production
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+# Upgrade packages and create non-root user
+RUN apk upgrade --no-cache && \
+    addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
 WORKDIR /app
 
