@@ -43,6 +43,9 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install ESLint v8
+        run: npm install -g eslint@8
+
       - name: Lint JavaScript code
         run: |
           cd frontend

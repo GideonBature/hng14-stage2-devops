@@ -84,8 +84,9 @@ def test_get_job_queries_correct_redis_key(mock_redis):
 
 
 def test_health_check_handles_redis_failure():
+    import redis
     with patch("main.redis_client") as mock:
-        mock.ping.side_effect = Exception("connection refused")
+        mock.ping.side_effect = redis.ConnectionError("connection refused")
         response = client.get("/health")
         assert response.status_code == 200
         assert response.json()["status"] == "unhealthy"

@@ -20,6 +20,7 @@ redis_client = redis.Redis(
     decode_responses=True
 )
 
+
 @app.get("/health")
 def health_check():
     try:
@@ -28,6 +29,7 @@ def health_check():
     except redis.ConnectionError:
         return {"status": "unhealthy", "error": "redis connection failed"}
 
+
 @app.post("/jobs")
 def create_job():
     job_id = str(uuid.uuid4())
@@ -35,6 +37,7 @@ def create_job():
     redis_client.hset(f"job:{job_id}", mapping={"status": "queued"})
     logger.info(f"Created job: {job_id}")
     return {"job_id": job_id}
+
 
 @app.get("/jobs/{job_id}")
 def get_job(job_id: str):
