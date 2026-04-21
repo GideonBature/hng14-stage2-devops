@@ -248,7 +248,7 @@ jobs:
         run: |
           API_HEALTHY=false
           for i in {1..30}; do
-            if curl -sf http://localhost:8000/health | grep -q "healthy"; then
+            if docker compose exec -T api python -c "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read().decode())" | grep -q "healthy"; then
               echo "API is healthy"
               API_HEALTHY=true
               break
@@ -344,7 +344,7 @@ jobs:
                 echo "Health check timed out after ${TIMEOUT}s, aborting deployment"
                 exit 1
               fi
-              if curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+              if docker compose exec -T api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" > /dev/null 2>&1; then
                 echo "API healthy after ${ELAPSED}s"
                 break
               fi
@@ -365,6 +365,6 @@ jobs:
           script: |
             cd ~/hng14-stage2-devops
             docker compose ps
-            curl -f http://localhost:8000/health || exit 1
+            docker compose exec -T api python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" || exit 1
             curl -f http://localhost:3000/health || exit 1
             echo "Deployment verified"
