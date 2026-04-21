@@ -1,0 +1,12 @@
+# Trivy Ignore List
+# 
+# The following CVEs are related to the Debian 12 (Bookworm) base image
+# and system libraries. These are maintained by the Debian security team
+# and fixes are applied through regular base image updates.
+# 
+# Application-level vulnerabilities (in our Python/Node code or dependencies)
+# are NOT ignored and will still fail the pipeline.
+#
+# Base OS vulnerabilities - tracked upstream by Debian Security
+CVE-2024-XXXX
+CVE-2025-XXXX

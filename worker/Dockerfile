@@ -1,21 +1,20 @@
 # Build stage
-FROM python:3.11-slim-bookworm AS builder
+FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
 # Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends gcc && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache gcc musl-dev linux-headers
 
 # Copy and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Production stage
-FROM python:3.11-slim-bookworm AS production
+FROM python:3.11-alpine AS production
 
 # Create non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN addgroup -S appuser && adduser -S appuser -G appuser
 
 WORKDIR /app
 
