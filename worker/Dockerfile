@@ -3,8 +3,9 @@ FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache gcc musl-dev linux-headers
+# Upgrade packages and install build dependencies
+RUN apk upgrade --no-cache && \
+    apk add --no-cache gcc musl-dev linux-headers
 
 # Copy and install Python dependencies
 COPY requirements.txt .
@@ -13,8 +14,9 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # Production stage
 FROM python:3.11-alpine AS production
 
-# Create non-root user
-RUN addgroup -S appuser && adduser -S appuser -G appuser
+# Upgrade packages and create non-root user
+RUN apk upgrade --no-cache && \
+    addgroup -S appuser && adduser -S appuser -G appuser
 
 WORKDIR /app
 
