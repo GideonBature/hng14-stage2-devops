@@ -199,6 +199,7 @@ jobs:
           severity: 'CRITICAL'
           exit-code: '1'
           ignore-unfixed: true
+          skip-setup-trivy: true
 
       - name: Run Trivy scanner on Worker
         uses: aquasecurity/trivy-action@master
@@ -209,6 +210,7 @@ jobs:
           severity: 'CRITICAL'
           exit-code: '1'
           ignore-unfixed: true
+          skip-setup-trivy: true
 
       - name: Run Trivy scanner on Frontend
         uses: aquasecurity/trivy-action@master
@@ -219,6 +221,7 @@ jobs:
           severity: 'CRITICAL'
           exit-code: '1'
           ignore-unfixed: true
+          skip-setup-trivy: true
 
       - name: Upload Trivy scan results
         if: always()
