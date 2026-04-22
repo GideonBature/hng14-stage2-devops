@@ -89,10 +89,15 @@ jobs:
           pip install -r requirements.txt
           pip install -r requirements-test.txt
 
-      - name: Run tests with coverage
+      - name: Run API tests with coverage
         run: |
           cd api
           pytest tests/ -v --cov=. --cov-report=xml --cov-report=html --cov-fail-under=80
+
+      - name: Run root tests
+        run: |
+          pip install pytest httpx
+          pytest tests/ -v
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -161,10 +166,16 @@ jobs:
           docker pull ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest
           docker pull ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest
           docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
+          docker tag ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+          docker tag ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+          docker tag ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
           docker save \
             ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest \
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:${{ steps.vars.outputs.sha_short }} \
             ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest \
+            ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:${{ steps.vars.outputs.sha_short }} \
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest \
+            ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }} \
             -o images.tar
 
       - name: Upload images artifact
@@ -194,28 +205,42 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest'
-          format: 'table'
+          format: 'sarif'
+          output: 'trivy-api-results.sarif'
           severity: 'CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
 
       - name: Run Trivy scanner on Worker
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest'
-          format: 'table'
+          format: 'sarif'
+          output: 'trivy-worker-results.sarif'
           severity: 'CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
 
       - name: Run Trivy scanner on Frontend
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest'
-          format: 'table'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
           severity: 'CRITICAL'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
+
+      - name: Upload Trivy scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-scan-results
+          path: |
+            trivy-api-results.sarif
+            trivy-worker-results.sarif
+            trivy-frontend-results.sarif
+          retention-days: 7
 
   # Stage 5: Integration Test
   integration-test:
