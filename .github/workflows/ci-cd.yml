@@ -319,6 +319,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Validate deployment secrets
+        run: |
+          MISSING=""
+          if [ -z "$SERVER_HOST" ]; then
+            MISSING="$MISSING SERVER_HOST"
+          fi
+          if [ -z "$SERVER_USER" ]; then
+            MISSING="$MISSING SERVER_USER"
+          fi
+          if [ -z "$SERVER_SSH_KEY" ]; then
+            MISSING="$MISSING SERVER_SSH_KEY"
+          fi
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing required deployment secrets:$MISSING"
+            echo "Please add them in Settings > Secrets and variables > Actions > Repository secrets"
+            exit 1
+          fi
+          echo "All deployment secrets are configured"
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
