@@ -353,6 +353,9 @@ jobs:
             cd ~/hng14-stage2-devops
             git pull origin main
 
+            # Stop old containers to free ports
+            docker compose down
+
             # Build new images
             docker compose build
 
