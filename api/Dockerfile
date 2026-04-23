@@ -10,7 +10,7 @@ RUN apk upgrade --no-cache && \
 
 # Copy and install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip==25.3 setuptools==78.0.0 wheel==0.46.2 jaraco.context==6.1.0 && \
+RUN pip install --no-cache-dir --upgrade pip==25.3 setuptools==78.0.1 wheel==0.46.2 jaraco.context==6.1.0 && \
     pip install --no-cache-dir --user -r requirements.txt
 
 # Production stage
