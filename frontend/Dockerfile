@@ -9,8 +9,9 @@ RUN apk upgrade --no-cache
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install --omit=dev
+# Install dependencies and update vulnerable packages
+RUN npm install --omit=dev && \
+    npm update
 
 # Production stage
 FROM node:18-alpine AS production
