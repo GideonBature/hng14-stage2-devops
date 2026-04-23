@@ -248,10 +248,55 @@ jobs:
             trivy-frontend-results.sarif
           retention-days: 7
 
+      - name: Log API vulnerabilities
+        if: steps.trivy-api.outcome == 'failure'
+        run: |
+          echo "=== API VULNERABILITIES ==="
+          python3 -c "
+          import json
+          with open('trivy-api-results.sarif') as f:
+              data = json.load(f)
+          for run in data.get('runs', []):
+              for result in run.get('results', []):
+                  rule = result.get('ruleId', 'unknown')
+                  msg = result.get('message', {}).get('text', '')
+                  print(f'  - {rule}: {msg[:200]}')
+          "
+
+      - name: Log Worker vulnerabilities
+        if: steps.trivy-worker.outcome == 'failure'
+        run: |
+          echo "=== WORKER VULNERABILITIES ==="
+          python3 -c "
+          import json
+          with open('trivy-worker-results.sarif') as f:
+              data = json.load(f)
+          for run in data.get('runs', []):
+              for result in run.get('results', []):
+                  rule = result.get('ruleId', 'unknown')
+                  msg = result.get('message', {}).get('text', '')
+                  print(f'  - {rule}: {msg[:200]}')
+          "
+
+      - name: Log Frontend vulnerabilities
+        if: steps.trivy-frontend.outcome == 'failure'
+        run: |
+          echo "=== FRONTEND VULNERABILITIES ==="
+          python3 -c "
+          import json
+          with open('trivy-frontend-results.sarif') as f:
+              data = json.load(f)
+          for run in data.get('runs', []):
+              for result in run.get('results', []):
+                  rule = result.get('ruleId', 'unknown')
+                  msg = result.get('message', {}).get('text', '')
+                  print(f'  - {rule}: {msg[:200]}')
+          "
+
       - name: Verify no CRITICAL vulnerabilities
         if: steps.trivy-api.outcome == 'failure' || steps.trivy-worker.outcome == 'failure' || steps.trivy-frontend.outcome == 'failure'
         run: |
-          echo "::error::CRITICAL vulnerabilities found in one or more images. Check SARIF artifacts."
+          echo "::error::CRITICAL vulnerabilities found in one or more images. See logs above for details."
           exit 1
 
   # Stage 5: Integration Test
