@@ -202,7 +202,9 @@ jobs:
         run: docker load -i images.tar
 
       - name: Run Trivy scanner on API
+        id: trivy-api
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest'
           format: 'sarif'
@@ -212,7 +214,9 @@ jobs:
           ignore-unfixed: true
 
       - name: Run Trivy scanner on Worker
+        id: trivy-worker
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest'
           format: 'sarif'
@@ -222,7 +226,9 @@ jobs:
           ignore-unfixed: true
 
       - name: Run Trivy scanner on Frontend
+        id: trivy-frontend
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
           image-ref: '${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest'
           format: 'sarif'
@@ -241,6 +247,12 @@ jobs:
             trivy-worker-results.sarif
             trivy-frontend-results.sarif
           retention-days: 7
+
+      - name: Verify no CRITICAL vulnerabilities
+        if: steps.trivy-api.outcome == 'failure' || steps.trivy-worker.outcome == 'failure' || steps.trivy-frontend.outcome == 'failure'
+        run: |
+          echo "::error::CRITICAL vulnerabilities found in one or more images. Check SARIF artifacts."
+          exit 1
 
   # Stage 5: Integration Test
   integration-test:
