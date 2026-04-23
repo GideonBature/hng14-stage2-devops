@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -14,11 +14,13 @@ RUN npm install --omit=dev && \
     npm update
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 
 # Upgrade packages and create non-root user
 RUN apk upgrade --no-cache && \
-    addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
+    addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001 && \
+    rm -rf /usr/local/lib/node_modules/npm && \
+    rm -f /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 
