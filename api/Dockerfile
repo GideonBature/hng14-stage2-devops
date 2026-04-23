@@ -5,7 +5,8 @@ WORKDIR /app
 
 # Upgrade packages and install build dependencies
 RUN apk upgrade --no-cache && \
-    apk add --no-cache gcc musl-dev linux-headers
+    apk add --no-cache gcc musl-dev linux-headers && \
+    rm -rf /var/cache/apk/*
 
 # Copy and install Python dependencies
 COPY requirements.txt .
