@@ -136,6 +136,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:latest
             ${{ env.REGISTRY }}/${{ env.API_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+          no-cache: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -147,6 +148,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:latest
             ${{ env.REGISTRY }}/${{ env.WORKER_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+          no-cache: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -158,6 +160,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:latest
             ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE }}:${{ steps.vars.outputs.sha_short }}
+          no-cache: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
