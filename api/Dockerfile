@@ -12,7 +12,8 @@ RUN apk upgrade --no-cache && \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip==26.0 setuptools==78.1.1 wheel==0.46.2 jaraco.context==6.1.0 && \
     pip install --no-cache-dir --user -r requirements.txt && \
-    pip install --no-cache-dir --user --upgrade wheel==0.46.2 jaraco.context==6.1.0
+    pip install --no-cache-dir --user --force-reinstall --no-deps wheel==0.46.2 jaraco.context==6.1.0 && \
+    python -c "import importlib.metadata as m; assert m.version('wheel') == '0.46.2'; assert m.version('jaraco.context') == '6.1.0'"
 
 # Production stage
 FROM python:3.11-alpine AS production
